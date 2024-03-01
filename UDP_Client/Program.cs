@@ -2,7 +2,7 @@
 using System.Net.Sockets;
 using System.Text;
 
-using var loader = new FileLoader("127.0.0.1", 13374);
+using var loader = new FileLoader("10.0.0.101", 13374);
 
 await loader.RequestFile("4kwallpaper.jpg");
 
