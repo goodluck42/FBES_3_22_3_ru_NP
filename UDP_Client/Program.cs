@@ -5,7 +5,7 @@ using System.Text;
 using var loader = new FileLoader("10.0.0.198", 13375);
 
 await loader.RequestFile("4kwallpaper.jpg");
-
+// 95959504
 Console.Read();
 
 class FileLoader : IDisposable
