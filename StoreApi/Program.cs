@@ -71,7 +71,7 @@ app.MapPut("/product/{id:int}", async (int id, Product? product, StoreDbContext 
     return Results.Ok();
 });
 
-app.MapDelete("/product/{id:int}", (int id, StoreDbContext context) =>
+app.MapDelete("/product/{id:int}", async (int id, StoreDbContext context) =>
 {
     var result = context.Products.FirstOrDefault(p => p.Id == id);
 
@@ -79,6 +79,8 @@ app.MapDelete("/product/{id:int}", (int id, StoreDbContext context) =>
     {
         context.Products.Remove(result);
 
+        await context.SaveChangesAsync();
+        
         return Results.Ok();
     }
 
