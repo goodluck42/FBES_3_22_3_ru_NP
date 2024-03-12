@@ -7,7 +7,7 @@ int main()
     TCHAR* buffer = new TCHAR[32];
     auto result = GetEnvironmentVariable(TEXT("USERNAME"), buffer, MAX_PATH);
 
-    std::cout << "Result = " << result << '\n';
+    std::cout << R"Result = " << result << '\n';
     
     //std::cout << (char*)buffer[0];
     //std::cout << (char*)buffer[1];
