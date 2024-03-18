@@ -1,11 +1,10 @@
 ﻿using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Text.Json;
 
 
 var client = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.IP);
-
-Console.WriteLine("Enter nickname to connect");
 
 try
 {
@@ -18,42 +17,31 @@ catch (SocketException ex)
     return;
 }
 
-Task.Run(() =>
+var users = new List<User>
 {
-    try
+    new()
     {
-        while (true)
-        {
-            var buffer = new byte[1024];
-
-            client.Receive(buffer);
-
-            var message = Encoding.UTF8.GetString(buffer);
-
-            Console.WriteLine($"Message from server: {message}");
-        }
-    }
-    catch (SocketException ex)
+        Login = "Log1",
+        Password = "Pass1"
+    },
+    new()
     {
-        Console.WriteLine(ex.Message);
+        Login = "Log1",
+        Password = "Pass1"
     }
-    finally
-    {
-        client.Dispose();
-    }
-});
+};
 
-while (true)
+var message = JsonSerializer.Serialize(users);
+
+
+byte[] bytes = Encoding.UTF8.GetBytes(message);
+
+client.Send(bytes);
+
+
+
+record User
 {
-    string message = Console.ReadLine()!;
-
-    if (message == "0")
-    {
-        client.Disconnect(false);
-        break;
-    }
-
-    byte[] bytes = Encoding.UTF8.GetBytes(message);
-
-    client.Send(bytes);
+    public string? Login { get; set; }
+    public string? Password { get; set; }
 }

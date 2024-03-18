@@ -6,7 +6,7 @@ namespace TCP_Server;
 
 internal class TcpServer
 {
-    private const int DatagramSize = 65000;
+    private const int PacketSize = 65000;
     private const string DefaultPath = @"C:\Users\Alex\Desktop\";
     private TcpListener? _tcpListener;
     private bool _listening;
@@ -52,7 +52,7 @@ internal class TcpServer
 
     private async Task ListenHandler()
     {
-        var buffer = new byte[DatagramSize];
+        var buffer = new byte[PacketSize];
 
         while (_resetEvent.WaitOne())
         {
@@ -63,7 +63,7 @@ internal class TcpServer
                 tcpClient = await _tcpListener!.AcceptTcpClientAsync();
                 var binaryReader = new BinaryReader(tcpClient.GetStream());
 
-                int read = binaryReader.Read(buffer, 0, DatagramSize);
+                int read = binaryReader.Read(buffer, 0, PacketSize);
                 
                 if (read <= 0)
                 {
@@ -130,7 +130,7 @@ internal class TcpServer
     private static IEnumerable<Chunk> ReadFile(string path)
     {
         using var fileStream = new FileStream(path, FileMode.Open, FileAccess.Read);
-        var buffer = new byte[DatagramSize];
+        var buffer = new byte[PacketSize];
         var chunkNumber = 0;
 
         while (true)
@@ -156,7 +156,7 @@ internal class TcpServer
 
             chunkSize += sizeof(int);
 
-            var read = fileStream.Read(buffer, offset + sizeof(int), DatagramSize - sizeof(int) * 2);
+            var read = fileStream.Read(buffer, offset + sizeof(int), PacketSize - sizeof(int) * 2);
             chunkSize += read;
 
             var chunkLengthBytes = BitConverter.GetBytes(read);

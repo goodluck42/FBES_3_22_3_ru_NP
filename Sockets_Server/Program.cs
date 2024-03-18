@@ -2,6 +2,7 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Text.Json;
 
 
 using var server = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.IP);
@@ -22,28 +23,31 @@ while (true)
 
     Task.Run(() =>
     {
-        byte[] buffer = new byte[1024];
-
+        byte[] buffer = new byte[4096];
+        
         try
         {
-            int byteLength = 0;
-            while ((byteLength = client.Receive(buffer)) > 0)
+            int read = 0;
+            while ((read = client.Receive(buffer)) > 0)
             {
-                var message = Encoding.UTF8.GetString(buffer);
-                var reversed = message.Reverse();
-                var builder = new StringBuilder();
+                Console.WriteLine($"read: {read}");
+                var message = Encoding.UTF8.GetString(buffer[..read]);
+                var users = JsonSerializer.Deserialize<User[]>(message);
 
-                foreach (var symbol in reversed)
+                if (users == null)
                 {
-                    builder.Append(symbol);
+                    Console.WriteLine("Error!");
+                    break;
                 }
 
-                Console.WriteLine($"[{byteLength}]: {message}");
+                Console.WriteLine($"users.Length: {users.Length}");
+                
+                foreach (var user in users)
+                {
+                    Console.WriteLine(user.ToString());
+                }
 
-                var response = Encoding.UTF8.GetBytes(builder.ToString());
-
-                client.Send(response);
-                Array.Clear(buffer, 0, byteLength);
+                Array.Clear(buffer, 0, read);
             }
         }
         catch (SocketException ex)
@@ -55,4 +59,10 @@ while (true)
             client.Dispose();
         }
     });
+}
+
+record User
+{
+    public string? Login { get; set; }
+    public string? Password { get; set; }
 }
